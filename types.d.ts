@@ -7,3 +7,11 @@ type Profile = {
   birthdate: string
   registeredAt: string
 }
+
+type Post = {
+  userId: string
+  username: string
+  userImg: string
+  img: string
+  caption: string
+}
