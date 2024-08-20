@@ -32,5 +32,5 @@
     "tsconfig.json",
     "app/page.tsx"
   ],
-  "cSpell.ignoreWords": ["Image", "birthdate", "webp"]
+  "cSpell.ignoreWords": ["Image", "ahmedbenali", "birthdate", "ipfs", "webp"]
 }

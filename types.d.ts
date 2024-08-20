@@ -6,6 +6,7 @@ type Profile = {
   password: string
   birthdate: string
   registeredAt: string
+  company: string
 }
 
 type Post = {

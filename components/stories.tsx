@@ -14,6 +14,7 @@ function Stories() {
         internet: { email, password, userName },
         image: { avatar },
         date: { birthdate, past },
+        company,
       } = faker
       return {
         // ...faker.helpers.contextualCard(),
@@ -24,6 +25,7 @@ function Stories() {
         password: password(),
         birthdate: birthdate().toLocaleDateString(),
         registeredAt: past().toLocaleDateString(),
+        company: company.name(),
       }
     })
 
