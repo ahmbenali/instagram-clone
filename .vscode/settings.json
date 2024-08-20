@@ -31,5 +31,6 @@
     "README.md",
     "tsconfig.json",
     "app/page.tsx"
-  ]
+  ],
+  "cSpell.ignoreWords": ["Image", "birthdate", "webp"]
 }

@@ -25,25 +25,33 @@ function Header() {
           </div> */}
         <Link
           href="/"
-          className="hidden lg:inline-flex"
+          className="hidden lg:inline-flex "
         >
           <Image
             src="/logo_desktop.webp"
             alt="Instagram Logo"
-            width={96}
-            height={96}
+            // width={96}
+            // height={96}
+            width="0"
+            height="0"
+            sizes="100vw"
+            className="w-24 h-auto"
           />
         </Link>
         {/* logo mobile*/}
         <Link
           href="/"
-          className="lg:hidden"
+          className="lg:hidden w-auto"
         >
           <Image
             src="/logo_mobile.webp"
             alt="Instagram Logo"
-            width={40}
-            height={40}
+            // width={40}
+            // height={40}
+            width="0"
+            height="0"
+            sizes="100vw"
+            className="w-10 h-auto"
           />
         </Link>
 

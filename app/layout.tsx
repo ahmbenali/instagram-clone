@@ -23,7 +23,7 @@ export default function RootLayout({
     >
       <body className={inter.className}>
         <Header />
-        <main className="bg-gray-50 min-h-screen">{children}</main>
+        <main className="">{children}</main>
       </body>
     </html>
   )
