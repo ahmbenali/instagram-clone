@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Header from '~/components/header'
+import { PropsWithChildren } from 'react'
+import { Header, Providers } from '~/components'
 import '../styles/globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -11,20 +12,20 @@ export const metadata: Metadata = {
     'A clone of Instagram built with Next.js 14, Firebase, Tailwind css and NextAuth',
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
-      <body className={inter.className}>
-        <Header />
-        <main className="">{children}</main>
-      </body>
-    </html>
+    <Providers>
+      <html
+        lang="en"
+        suppressHydrationWarning
+      >
+        <body className={inter.className}>
+          <Header />
+          <main className="">{children}</main>
+        </body>
+      </html>
+    </Providers>
   )
 }
+
+export default RootLayout

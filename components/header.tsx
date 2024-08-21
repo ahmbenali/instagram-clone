@@ -1,3 +1,5 @@
+'use client'
+
 import {
   HeartIcon,
   MenuIcon,
@@ -7,10 +9,15 @@ import {
   UserGroupIcon,
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 function Header() {
+  const { data: session } = useSession()
+  // console.log('SESSION: ', session)
+  // const {user: {name, image} } = session || {}
+
   return (
     <div className="sticky top-0 z-50 bg-white shadow-sm p-3">
       <div className="flex justify-between items-center mx-auto max-w-6xl">
@@ -82,13 +89,23 @@ function Header() {
           <UserGroupIcon className="navBtn" />
           <MenuIcon className="h-6  md:hidden cursor-pointer" />
           <HeartIcon className="navBtn" />
-          <Image
-            src="/profile_img.gif"
-            alt=""
-            width={30}
-            height={30}
-            className="rounded-full cursor-pointer"
-          />
+          {session ? (
+            <Image
+              src={session?.user?.image!}
+              alt={session?.user?.name!}
+              width={30}
+              height={30}
+              className="rounded-full cursor-pointer"
+              onClick={() => signOut()}
+            />
+          ) : (
+            <button
+              className="text-sm font-semibold text-blue-500"
+              onClick={() => signIn()}
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
     </div>
