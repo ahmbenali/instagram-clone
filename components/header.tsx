@@ -1,35 +1,30 @@
 'use client'
 
 import {
+  CameraIcon,
   HeartIcon,
   MenuIcon,
   PaperAirplaneIcon,
   PlusCircleIcon,
   SearchIcon,
   UserGroupIcon,
+  XIcon,
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
+import Modal from 'react-modal'
 
 function Header() {
   const { data: session } = useSession()
-  // console.log('SESSION: ', session)
-  // const {user: {name, image} } = session || {}
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="sticky top-0 z-50 bg-white shadow-sm p-3">
       <div className="flex justify-between items-center mx-auto max-w-6xl">
         {/* logo desktop */}
-        {/*   <div className="hidden lg:inline-flex relative w-24">
-            <Image
-              src="/logo_desktop.webp"
-              alt="Instagram Logo"
-              layout="fill"
-              objectFit="contain"
-            />
-          </div> */}
         <Link
           href="/"
           className="hidden lg:inline-flex "
@@ -37,8 +32,6 @@ function Header() {
           <Image
             src="/logo_desktop.webp"
             alt="Instagram Logo"
-            // width={96}
-            // height={96}
             width="0"
             height="0"
             sizes="100vw"
@@ -53,8 +46,6 @@ function Header() {
           <Image
             src="/logo_mobile.webp"
             alt="Instagram Logo"
-            // width={40}
-            // height={40}
             width="0"
             height="0"
             sizes="100vw"
@@ -85,20 +76,29 @@ function Header() {
               10
             </div>
           </div>
-          <PlusCircleIcon className="navBtn" />
+
           <UserGroupIcon className="navBtn" />
           <MenuIcon className="h-6  md:hidden cursor-pointer" />
           <HeartIcon className="navBtn" />
-          {session ? (
-            <Image
-              src={session?.user?.image!}
-              alt={session?.user?.name!}
-              width={30}
-              height={30}
-              className="rounded-full cursor-pointer"
-              onClick={() => signOut()}
-            />
-          ) : (
+
+          {session && (
+            <>
+              <PlusCircleIcon
+                onClick={() => setIsOpen(true)}
+                className="navBtn hover:text-red-600"
+              />
+              <Image
+                src={session?.user?.image!}
+                alt={session?.user?.name!}
+                width={30}
+                height={30}
+                className="rounded-full cursor-pointer"
+                onClick={() => signOut()}
+              />
+            </>
+          )}
+
+          {!session && (
             <button
               className="text-sm font-semibold text-blue-500"
               onClick={() => signIn()}
@@ -108,6 +108,36 @@ function Header() {
           )}
         </div>
       </div>
+
+      {/* Add pop-up modal for media uploading  */}
+      {isOpen && (
+        <Modal
+          isOpen={isOpen}
+          className="max-w-lg bg-white w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] border-2 rounded-m shadow-md"
+          onRequestClose={() => setIsOpen(false)}
+          ariaHideApp={false}
+        >
+          <div className="flex-col-center h-[100%]">
+            <CameraIcon className="w-10 h-10 text-gray-400 cursor-pointer" />
+          </div>
+          <input
+            type="text"
+            maxLength={200}
+            placeholder="Enter caption..."
+            className=" m-4 w-full border-0 text-center  focus:ring-0 placeholder-gray-500 outline-none"
+          />
+          <button
+            disabled
+            className="bg-red-600 w-full p-2 text-white rounded-lg shadow-md hover:brightness-105 transform transition-all duration-150 ease-out disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
+          >
+            Upload Post
+          </button>
+          <XIcon
+            onClick={() => setIsOpen(false)}
+            className="h-5 w-5 cursor-pointer absolute top-2 right-2 hover:text-red-600 transform transition-all duration-150 ease-out"
+          />
+        </Modal>
+      )}
     </div>
   )
 }

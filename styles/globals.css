@@ -11,6 +11,22 @@
   .btn {
     @apply h-7 hover:scale-125 cursor-pointer transition-all duration-150 ease-out;
   }
+
+  .flex-center {
+    @apply flex justify-center items-center
+  }
+  .flex-center {
+    @apply flex justify-center items-center
+  }
+  .flex-col-center {
+    @apply flex flex-col justify-center items-center
+  }
+  .flex-between {
+    @apply flex items-center justify-between
+  }
+  .flex-items {
+    @apply flex items-center
+  }
 }
 
 @layer utilities {
