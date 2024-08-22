@@ -12,6 +12,12 @@ import {
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
 import {
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+} from 'firebase/firestore'
+import {
   getDownloadURL,
   getStorage,
   ref,
@@ -31,6 +37,9 @@ function Header() {
   const [imageFileUrl, setImageFileUrl] = useState('')
   const filePickerRef = useRef<HTMLInputElement>(null)
   const [imageFileUploading, setImageFileUploading] = useState(false)
+  const [postUploading, setPostUploading] = useState(false)
+  const [caption, setCaption] = useState('')
+  const db = getFirestore(app)
 
   // handle add image to post
   const addImageToPost = (ev: ChangeEvent<HTMLInputElement>) => {
@@ -78,8 +87,36 @@ function Header() {
         }
       )
     }
+
+    // console.log('SESSION: ', session)
+
     if (selectedFile) uploadImageToStorage()
   }, [selectedFile])
+
+  const handleUploadPost = async () => {
+    setPostUploading(true)
+
+    const docRef = await addDoc(collection(db, 'posts'), {
+      username: session?.user?.name!.split(' ').join('').toLocaleLowerCase(),
+      profileImg: session?.user?.image,
+      image: imageFileUrl,
+      timestamp: serverTimestamp(),
+      caption,
+    })
+
+    // console.log('docRef: ', docRef)
+    setPostUploading(false)
+    setIsOpen(false)
+
+    /*  if (!imageFileUrl) return
+
+    const post = {
+      username: session?.user?.name,
+      profileImg: session?.user?.image,
+      image: imageFileUrl,
+    }
+    console.log(post) */
+  }
 
   return (
     <div className="sticky top-0 z-50 bg-white shadow-sm p-3">
@@ -192,6 +229,7 @@ function Header() {
               }`}
             />
           )}
+
           {!selectedFile && (
             <CameraIcon
               onClick={() => filePickerRef.current?.click()}
@@ -208,12 +246,19 @@ function Header() {
         </div>
         <input
           type="text"
-          maxLength={200}
+          maxLength={150}
           placeholder="Enter caption..."
           className=" m-4 w-full border-0 text-center  focus:ring-0 placeholder-gray-500 outline-none"
+          onChange={ev => setCaption(ev.target.value)}
         />
         <button
-          disabled
+          onClick={handleUploadPost}
+          disabled={
+            !selectedFile ||
+            imageFileUploading ||
+            !caption.trim() ||
+            postUploading
+          }
           className="bg-red-600 w-full p-2 text-white rounded-lg shadow-md hover:brightness-105 transform transition-all duration-150 ease-out disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
         >
           Upload Post
