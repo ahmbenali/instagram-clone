@@ -30,7 +30,7 @@ function Stories() {
     })
 
     setSuggestions(suggestions)
-    console.log('suggestions: ', suggestions)
+    // console.log('suggestions: ', suggestions)
   }, [])
 
   return (

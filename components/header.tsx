@@ -11,15 +11,75 @@ import {
   XIcon,
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from 'firebase/storage'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Modal from 'react-modal'
+import { app } from '~/firebase'
 
 function Header() {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [imageFileUrl, setImageFileUrl] = useState('')
+  const filePickerRef = useRef<HTMLInputElement>(null)
+  const [imageFileUploading, setImageFileUploading] = useState(false)
+
+  // handle add image to post
+  const addImageToPost = (ev: ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0] // the first file
+
+    // select image from local computer
+    if (file) {
+      setSelectedFile(file)
+      setImageFileUrl(URL.createObjectURL(file))
+      // console.log(file, URL.createObjectURL(file))
+    }
+  }
+
+  // upload image to cloudinary
+  useEffect(() => {
+    const uploadImageToStorage = async () => {
+      setImageFileUploading(true)
+
+      const storage = getStorage(app)
+      const fileName = new Date().getTime() + '-' + selectedFile?.name
+
+      const storageRef = ref(storage, fileName)
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile!)
+
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+
+          console.log('Upload is ' + progress + '% done')
+        },
+        error => {
+          console.log(error)
+          setImageFileUploading(false)
+          setImageFileUrl('')
+          setSelectedFile(null)
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+            setImageFileUrl(downloadURL)
+            setImageFileUploading(false)
+            // setSelectedFile(null)
+          })
+        }
+      )
+    }
+    if (selectedFile) uploadImageToStorage()
+  }, [selectedFile])
 
   return (
     <div className="sticky top-0 z-50 bg-white shadow-sm p-3">
@@ -110,34 +170,59 @@ function Header() {
       </div>
 
       {/* Add pop-up modal for media uploading  */}
-      {isOpen && (
-        <Modal
-          isOpen={isOpen}
-          className="max-w-lg bg-white w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] border-2 rounded-m shadow-md"
-          onRequestClose={() => setIsOpen(false)}
-          ariaHideApp={false}
-        >
-          <div className="flex-col-center h-[100%]">
-            <CameraIcon className="w-10 h-10 text-gray-400 cursor-pointer" />
-          </div>
+      <Modal
+        isOpen={isOpen}
+        className={`${
+          isOpen ? 'block' : 'hidden'
+        } max-w-lg bg-white w-[90%] p-6 absolute top-56 left-[50%] translate-x-[-50%] border-2 rounded-m shadow-md`}
+        onRequestClose={() => setIsOpen(false)}
+        ariaHideApp={false}
+      >
+        <div className="flex-col-center h-[100%]">
+          {selectedFile && (
+            <Image
+              /* remove file on click */
+              onClick={() => setSelectedFile(null)}
+              src={imageFileUrl}
+              alt=""
+              width={24}
+              height={24}
+              className={`w-full object-contain cursor-pointer max-h-[250px] ${
+                imageFileUploading ? 'animate-pulse' : ''
+              }`}
+            />
+          )}
+          {!selectedFile && (
+            <CameraIcon
+              onClick={() => filePickerRef.current?.click()}
+              className="w-10 h-10 text-gray-400 cursor-pointer"
+            />
+          )}
           <input
-            type="text"
-            maxLength={200}
-            placeholder="Enter caption..."
-            className=" m-4 w-full border-0 text-center  focus:ring-0 placeholder-gray-500 outline-none"
+            hidden
+            type="file"
+            accept="image/*"
+            ref={filePickerRef}
+            onChange={addImageToPost}
           />
-          <button
-            disabled
-            className="bg-red-600 w-full p-2 text-white rounded-lg shadow-md hover:brightness-105 transform transition-all duration-150 ease-out disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
-          >
-            Upload Post
-          </button>
-          <XIcon
-            onClick={() => setIsOpen(false)}
-            className="h-5 w-5 cursor-pointer absolute top-2 right-2 hover:text-red-600 transform transition-all duration-150 ease-out"
-          />
-        </Modal>
-      )}
+        </div>
+        <input
+          type="text"
+          maxLength={200}
+          placeholder="Enter caption..."
+          className=" m-4 w-full border-0 text-center  focus:ring-0 placeholder-gray-500 outline-none"
+        />
+        <button
+          disabled
+          className="bg-red-600 w-full p-2 text-white rounded-lg shadow-md hover:brightness-105 transform transition-all duration-150 ease-out disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
+        >
+          Upload Post
+        </button>
+        <XIcon
+          onClick={() => setIsOpen(false)}
+          className="h-5 w-5 cursor-pointer absolute top-2 right-2 hover:text-red-600 transform transition-all duration-150 ease-out"
+        />
+      </Modal>
     </div>
   )
 }

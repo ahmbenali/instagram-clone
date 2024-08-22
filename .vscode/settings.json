@@ -32,5 +32,13 @@
     "tsconfig.json",
     "app/page.tsx"
   ],
-  "cSpell.ignoreWords": ["Image", "ahmedbenali", "birthdate", "ipfs", "webp"]
+  "cSpell.ignoreWords": [
+    "Image",
+    "ahmedbenali",
+    "birthdate",
+    "firebasestorage",
+    "googleusercontent",
+    "ipfs",
+    "webp"
+  ]
 }
